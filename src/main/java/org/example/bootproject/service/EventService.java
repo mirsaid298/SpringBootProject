@@ -13,18 +13,6 @@ public class EventService {
     @Autowired
     private EventRepository eventRepository;
 
-    public List<String> getAllTeams() {
-        return eventRepository.findAllTeams();
-    }
-
-    public List<String> getAllEventDates() {
-        return eventRepository.findAllEventDates();
-    }
-
-    public List<String> getAllEventResults() {
-        return eventRepository.findAllResults();
-    }
-
     public List<Event> getAllEvents() {
         return eventRepository.findAll();
     }

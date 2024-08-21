@@ -1,11 +1,11 @@
 package org.example.bootproject.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "event")
 public class Event {
 
     @Id
@@ -19,7 +19,6 @@ public class Event {
 
     @ManyToOne
     @JoinColumn(name = "category_id")
-    @JsonBackReference
     private Category category;
 
     public Event() {}
@@ -79,10 +78,5 @@ public class Event {
 
     public void setCategory(Category category) {
         this.category = category;
-
-        if (category != null) {
-            category.getTeams().add(this.first_team);
-            category.getTeams().add(this.second_team);
-        }
     }
 }

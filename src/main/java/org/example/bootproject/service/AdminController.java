@@ -2,11 +2,12 @@ package org.example.bootproject.service;
 
 import org.example.bootproject.entity.Category;
 import org.example.bootproject.entity.Event;
+import org.example.bootproject.entity.Teams;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/admin")
@@ -31,13 +32,28 @@ public class AdminController {
     }
 
     @PostMapping("/add-event")
-    public Event addEvent(@RequestBody Event event) {
-        return adminService.createEvent(event);
+    public ResponseEntity<?> addEvent(@RequestBody Event event) {
+        try {
+            Event newEvent = adminService.createEvent(
+                    event,
+                    event.getFirst_team(),
+                    event.getSecond_team(),
+                    event.getCategory().getId()
+            );
+            return ResponseEntity.ok(newEvent);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PutMapping("/update-event/{id}")
-    public Event updateEvent(@PathVariable Long id, @RequestBody Event event) {
-        return adminService.updateEvent(id, event);
+    public ResponseEntity<?> updateEvent(@PathVariable Long id, @RequestBody Event event) {
+        try {
+            Event updatedEvent = adminService.updateEvent(id, event);
+            return ResponseEntity.ok(updatedEvent);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/delete-event/{id}")
@@ -45,8 +61,8 @@ public class AdminController {
         adminService.deleteEvent(id);
     }
 
-    @GetMapping("/all-teams/{id}")
-    public Set<String> getAllTeams(@PathVariable Long id) {
-        return adminService.getAllTeamsByCategory(id);
+    @GetMapping("/teams/{categoryId}")
+    public List<Teams> findTeamsByCategoryId(@PathVariable Long categoryId) {
+        return adminService.findTeamsByCategoryId(categoryId);
     }
 }

@@ -16,21 +16,6 @@ public class EventController {
     @Autowired
     private EventService eventService;
 
-    @GetMapping("/teams")
-    public List<String> getAllTeams() {
-        return eventService.getAllTeams();
-    }
-
-    @GetMapping("/dates")
-    public List<String> getAllEventDates() {
-        return eventService.getAllEventDates();
-    }
-
-    @GetMapping("/results")
-    public List<String> getAllEventResults() {
-        return eventService.getAllEventResults();
-    }
-
     @GetMapping("/list-matches")
     public ResponseEntity<?> getAllEvents(@RequestParam(name = "time-filter", required = false) String timeFilter,
                                           @RequestParam(name = "date", required = false) String dateFilter) {

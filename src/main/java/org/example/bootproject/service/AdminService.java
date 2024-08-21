@@ -1,15 +1,13 @@
 package org.example.bootproject.service;
 
-import jakarta.persistence.Id;
 import org.example.bootproject.entity.Category;
 import org.example.bootproject.entity.Event;
+import org.example.bootproject.entity.Teams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class AdminService {
@@ -19,6 +17,9 @@ public class AdminService {
 
     @Autowired
     CategoryRepository categoryRepository;
+
+    @Autowired
+    TeamsRepository teamsRepository;
 
     @Transactional
     public Category addCategory(Category category) {
@@ -39,15 +40,39 @@ public class AdminService {
         return categoryRepository.findAll();
     }
 
+    private Teams saveTeam(String teamName, Category category) {
+        Teams team = new Teams();
+        team.setTeamName(teamName);
+        team.setCategory(category);
+        return teamsRepository.save(team);
+    }
+
+    private Teams findOrCreateTeam(String teamName, Category category) {
+        return teamsRepository.findByTeamName(teamName).orElseGet(() -> saveTeam(teamName, category));
+    }
+
     @Transactional
-    public Event createEvent(Event event) {
-        Category category = categoryRepository.findById(event.getCategory().getId()).orElse(null);
+    public Event createEvent(Event event, String firstTeamName, String secondTeamName, Long categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElse(null);
 
         if (category == null) {
             throw new IllegalArgumentException("Category not found");
         }
 
-        event.setCategory(category);
+        Teams firstTeam = findOrCreateTeam(firstTeamName, category);
+        Teams secondTeam = findOrCreateTeam(secondTeamName, category);
+
+        if (firstTeamName.equalsIgnoreCase(secondTeamName)) {
+            throw new IllegalArgumentException("First team name cannot be the same as second team name");
+        }
+
+        if (!firstTeam.getCategory().equals(secondTeam.getCategory())) {
+            throw new IllegalArgumentException("First and Second teams must be in the same categories");
+        }
+
+        event.setCategory(firstTeam.getCategory());
+        event.setDate(event.getDate());
+        event.setResult(event.getResult());
 
         eventRepository.save(event);
         return event;
@@ -66,6 +91,16 @@ public class AdminService {
         existingEvent.setResult(event.getResult());
         existingEvent.setCategory(event.getCategory());
 
+        if (event.getFirst_team().equalsIgnoreCase(event.getSecond_team())) {
+            throw new IllegalArgumentException("First team cannot be the same as second team");
+        }
+
+        if (event.getCategory() != null && existingEvent.getCategory() != null) {
+            if (!event.getCategory().equals(existingEvent.getCategory())) {
+                throw new IllegalArgumentException("First and Second teams must be in the same categories");
+            }
+        }
+
         eventRepository.save(existingEvent);
         return existingEvent;
     }
@@ -80,15 +115,12 @@ public class AdminService {
         eventRepository.delete(existingEvent);
     }
 
-    public Set<String> getAllTeamsByCategory(Long id) {
-        Set<String> teams = new HashSet<>();
-        Category category = categoryRepository.findById(id).orElse(null);
+    public List<Teams> findTeamsByCategoryId(Long categoryId) {
+        Teams teams = teamsRepository.findById(categoryId).orElse(null);
 
-        if (category != null) {
-            teams.addAll(category.getTeams());
-        } else {
-            throw new IllegalArgumentException("Category not found with id: " + id);
+        if (teams == null) {
+            throw new IllegalArgumentException("Category not found");
         }
-        return teams;
+        return teamsRepository.findTeamsByCategoryId(categoryId);
     }
 }
