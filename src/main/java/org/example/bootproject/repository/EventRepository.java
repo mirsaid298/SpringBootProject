@@ -1,4 +1,4 @@
-package org.example.bootproject.service;
+package org.example.bootproject.repository;
 
 import org.example.bootproject.entity.Event;
 import org.springframework.data.jpa.repository.JpaRepository;

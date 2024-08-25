@@ -1,6 +1,7 @@
 package org.example.bootproject.service;
 
 import org.example.bootproject.entity.Event;
+import org.example.bootproject.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

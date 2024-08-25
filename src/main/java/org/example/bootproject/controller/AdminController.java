@@ -1,8 +1,9 @@
-package org.example.bootproject.service;
+package org.example.bootproject.controller;
 
 import org.example.bootproject.entity.Category;
 import org.example.bootproject.entity.Event;
 import org.example.bootproject.entity.Teams;
+import org.example.bootproject.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
